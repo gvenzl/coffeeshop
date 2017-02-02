@@ -1,6 +1,10 @@
 package com.oracle;
 
+import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.cert.X509Certificate;
 import java.sql.Connection;
@@ -30,37 +34,45 @@ import com.oracle.data.Coffee;
 import com.oracle.data.CustomerAndLocation;
 import com.oracle.data.StaticData;
 
-import oracle.jdbc.pool.OracleDataSource;
-
 public class Worker implements Runnable {
 
 	private Connection conn;
 	
 	private int waitSec;
 	private String restURL;
+	private boolean writeFile=false;
 	private boolean stop=false;
 	private boolean loadDB=false;
+	private boolean loadREST=false;
 	private PreparedStatement stmt=null;
 	private boolean staticData=false;
 	private boolean historicData=false;
 	private Random random;
+	private BufferedWriter bw;
 	
 	private static final int MAX_ORDERS=5;
-
 	
-	public Worker(String restURL, Integer waitSec, String jdbc, boolean staticData, boolean historicData) {
+	public Worker(String restURL, Integer waitSec, String jdbc, String file, boolean staticData, boolean historicData) {
 		this.waitSec = waitSec.intValue();
 		this.restURL = restURL;
 		this.staticData = staticData;
 		this.historicData = historicData;
 		this.random = new Random();
 		
+		if (!file.isEmpty()) {
+			writeFile = true;
+			
+			try {
+				bw = new BufferedWriter(new FileWriter(file));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
 		if (null != jdbc) {
 			loadDB = true;
 			try {
-				OracleDataSource ods = new OracleDataSource();
-				ods.setURL("jdbc:oracle:thin:" + jdbc);
-				conn = ods.getConnection();
+				conn = CloudConnectionManager.getConnection(new File("/Users/gvenzl/Documents/coffeeshop/client_credentials_Maria.zip"), "coffeeshop", "coffeeshop");
 				conn.setAutoCommit(false);
 				// Write into sales history table rather than sales
 				if (this.historicData) {
@@ -69,11 +81,13 @@ public class Worker implements Runnable {
 				else {
 					stmt = conn.prepareStatement("INSERT INTO ORDERS (order_details) VALUES(?)");
 				}
-			} catch (SQLException e) {
+			} catch (SQLException | IOException e) {
 				System.out.println("Bugger!");
 				System.out.println(e.getMessage());
 			}
 		}
+		
+		loadREST = !restURL.isEmpty();
 	}
 	
 	private String generateDate() {
@@ -111,7 +125,7 @@ public class Worker implements Runnable {
 	
 	private String generateOrders() {
 		
-		double sales_total = 0.0;
+		double salesTotal = 0.0;
 		String order = "\"order\": [";
 		Coffee coffeeSale = new Coffee();
 		
@@ -121,13 +135,13 @@ public class Worker implements Runnable {
 		for (int i=0;i<orders;i++) {
 			Coffee.CoffeeEntry coffee = coffeeSale.getCoffee();
 			order = order + coffee.coffee + ",";
-			sales_total += coffee.sales_amount;
+			salesTotal += coffee.salesAmount;
 		}
 		
 		// Round to 2 digits after the comma
 		DecimalFormat df = new DecimalFormat("###.##");
 		
-		return  "  \"sales_amount\": " + df.format(sales_total) + ",\n  " +
+		return  "  \"salesAmount\": " + df.format(salesTotal) + ",\n  " +
 		              order.substring(0, order.length()-1) + "]";
 	}
 	
@@ -155,11 +169,25 @@ public class Worker implements Runnable {
 	
 	private void loadData() {
 		String order = generateSale();
+		if (writeFile) {
+			writeIntoFile(order);
+		}
+		
 		if (loadDB) {
 			loadDataIntoDB(order);
 		}
-		else {
+		
+		if (loadREST) {
 			loadRest(order);
+		}
+	}
+	
+	private void writeIntoFile(String order) {
+		try {
+			bw.write(order.replaceAll("\n", "").replaceAll("\r", "").replaceAll("  ", "") + "\n");
+		} catch (IOException e) {
+			System.out.println("Can't write file.");
+			System.out.println(e.getMessage());
 		}
 	}
 	
@@ -176,6 +204,7 @@ public class Worker implements Runnable {
 	}
 	
 	private void loadRest(String data) {
+		
 		TrustManager[] trustAllCerts = new TrustManager[] { 
 			    new X509TrustManager() {     
 			        public java.security.cert.X509Certificate[] getAcceptedIssuers() { 

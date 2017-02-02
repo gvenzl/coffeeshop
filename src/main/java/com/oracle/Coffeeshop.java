@@ -8,6 +8,7 @@ public class Coffeeshop {
 		Integer waitSec=2;
 		String  restURL="";
 		String  jdbc=null;
+		String  file="";
 		boolean historicData = false;
 		
 		for (int i=0; i<args.length; i++) {
@@ -20,19 +21,22 @@ public class Coffeeshop {
 			else if (args[i].equalsIgnoreCase("--url")) {
 				restURL = args[++i];
 			}
+			else if (args[i].equalsIgnoreCase("--file")) {
+				file = args[++i];
+			}
 			else if (args[i].equalsIgnoreCase("--jdbc")) {
 				jdbc = args[++i];
 				
 				// Set system properties for SSO file
 				
-				System.setProperty("oracle.net.tns_admin", "./client_credentials");
-				System.setProperty("javax.net.ssl.trustStore", "truststore.jks");
-				System.setProperty("javax.net.ssl.trustStorePassword", "welcome1");
-				System.setProperty("javax.net.ssl.keyStore" ,"keystore.jks");
-				System.setProperty("javax.net.ssl.keyStorePassword", "welcome1");
-				System.setProperty("oracle.net.ssl_server_dn_match", "true");
-				System.setProperty("oracle.net.ssl_version", "1.2");
-				System.setProperty("oracle.net.ssl_cipher_suites", "'(TLS_RSA_WITH_AES_256_CBC_SHA256)'");
+//				System.setProperty("oracle.net.tns_admin", "./client_credentials");
+//				System.setProperty("javax.net.ssl.trustStore", "truststore.jks");
+//				System.setProperty("javax.net.ssl.trustStorePassword", "Welcome1!");
+//				System.setProperty("javax.net.ssl.keyStore" ,"keystore.jks");
+//				System.setProperty("javax.net.ssl.keyStorePassword", "Welcome1!");
+//				System.setProperty("oracle.net.ssl_server_dn_match", "true");
+//				System.setProperty("oracle.net.ssl_version", "1.2");
+//				System.setProperty("oracle.net.ssl_cipher_suites", "'(TLS_RSA_WITH_AES_256_CBC_SHA256)'");
 
 			}
 			else if (args[i].equalsIgnoreCase("--historic")) {
@@ -50,7 +54,7 @@ public class Coffeeshop {
 			}
 		}
 
-		new Coffeeshop().run(threads, waitSec, restURL, jdbc, historicData);
+		new Coffeeshop().run(threads, waitSec, restURL, jdbc, file, historicData);
 	}
 	
 	public static void printHelp() {
@@ -59,11 +63,12 @@ public class Coffeeshop {
 		System.out.println("--wait <n>\t\tThe amount of seconds that the program should pause between requests.");
 		System.out.println("--url <REST URL>\tThe REST URL to use for the rest call.");
 		System.out.println("--jdbc <JDBC url>\tThe JDBC connection string to use for the inserts.");
+		System.out.println("--file <file name>\tThe file name for the data.");
 		System.out.println("--historic\t\tLoads into historic table rather than active table");
 	}
 
-	public void run(Integer threads, Integer waitSec, String restURL, String jdbc, boolean historicData) {
-		Generator generator = new Generator(restURL, threads, waitSec, jdbc,  false, historicData);
+	public void run(Integer threads, Integer waitSec, String restURL, String jdbc, String file, boolean historicData) {
+		Generator generator = new Generator(restURL, threads, waitSec, jdbc,  file, false, historicData);
 		generator.run();
 	}
 
