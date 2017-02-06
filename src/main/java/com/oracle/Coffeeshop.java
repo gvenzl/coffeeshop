@@ -21,23 +21,12 @@ public class Coffeeshop {
 			else if (args[i].equalsIgnoreCase("--url")) {
 				restURL = args[++i];
 			}
-			else if (args[i].equalsIgnoreCase("--file")) {
-				file = args[++i];
-			}
 			else if (args[i].equalsIgnoreCase("--jdbc")) {
 				jdbc = args[++i];
-				
-				// Set system properties for SSO file
-				
-//				System.setProperty("oracle.net.tns_admin", "./client_credentials");
-//				System.setProperty("javax.net.ssl.trustStore", "truststore.jks");
-//				System.setProperty("javax.net.ssl.trustStorePassword", "Welcome1!");
-//				System.setProperty("javax.net.ssl.keyStore" ,"keystore.jks");
-//				System.setProperty("javax.net.ssl.keyStorePassword", "Welcome1!");
-//				System.setProperty("oracle.net.ssl_server_dn_match", "true");
-//				System.setProperty("oracle.net.ssl_version", "1.2");
-//				System.setProperty("oracle.net.ssl_cipher_suites", "'(TLS_RSA_WITH_AES_256_CBC_SHA256)'");
 
+			}
+			else if (args[i].equalsIgnoreCase("--file")) {
+				file = args[++i];
 			}
 			else if (args[i].equalsIgnoreCase("--historic")) {
 				historicData = true;
