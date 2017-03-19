@@ -38,7 +38,8 @@ public class Worker implements Runnable {
 
 	private Connection conn;
 	
-	private int waitSec;
+	private int batchSize = 0;
+	private int waitSec = 0;
 	private String restURL;
 	private boolean writeFile=false;
 	private boolean stop=false;
@@ -72,11 +73,11 @@ public class Worker implements Runnable {
 		if (null != jdbc) {
 			loadDB = true;
 			try {
-				conn = CloudConnectionManager.getConnection(new File("/Users/gvenzl/Documents/coffeeshop/client_credentials_Maria.zip"), "coffeeshop", "coffeeshop");
+				conn = CloudConnectionManager.getConnection(new File("/Users/gvenzl/Documents/coffeeshop/client_credentials_Maria.zip"), "coffeeshop", "coffeeshop", "dbaccess");
 				conn.setAutoCommit(false);
 				// Write into sales history table rather than sales
 				if (this.historicData) {
-					stmt = conn.prepareStatement("INSERT INTO ORDERS_HISTORY (sale) VALUES(?)");
+					stmt = conn.prepareStatement("INSERT INTO ORDERS_HISTORY (order_details) VALUES(?)");
 				}
 				else {
 					stmt = conn.prepareStatement("INSERT INTO ORDERS (order_details) VALUES(?)");
@@ -159,8 +160,10 @@ public class Worker implements Runnable {
 		while (!stop) {
 			loadData();
 			try {
-				int sleep = random.nextInt(waitSec);
-				Thread.sleep(sleep*1000);
+				if (waitSec > 0 ) {
+					int sleep = random.nextInt(waitSec);
+					Thread.sleep(sleep*1000);
+				}
 			} catch (InterruptedException e) {
 				stop=true;
 			}
@@ -193,9 +196,15 @@ public class Worker implements Runnable {
 	
 	private void loadDataIntoDB(String data) {
 		try {
+			batchSize = batchSize + 1;
 			stmt.setBlob(1, new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8)));
-			stmt.executeUpdate();
-			conn.commit();
+			stmt.addBatch();
+			if (batchSize == 100) {
+				stmt.executeBatch();
+				conn.commit();
+				batchSize = 0;
+			}
+			
 		} catch (SQLException e) {
 			System.out.println("Good try, but not good enough!");
 			System.out.println(e.getMessage());
@@ -233,6 +242,9 @@ public class Worker implements Runnable {
 			HttpResponse response = client.execute(post);
 			if (response.getStatusLine().getStatusCode() >= 400) {
 				System.out.println("REST service not available: " + response.getStatusLine());
+			}
+			else {
+				System.out.println("Data successfully posted!");
 			}
 		} catch (Exception e) {
 			System.out.println("Error on calling REST: " + e.getMessage());

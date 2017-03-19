@@ -23,7 +23,6 @@ public class Coffeeshop {
 			}
 			else if (args[i].equalsIgnoreCase("--jdbc")) {
 				jdbc = args[++i];
-
 			}
 			else if (args[i].equalsIgnoreCase("--file")) {
 				file = args[++i];

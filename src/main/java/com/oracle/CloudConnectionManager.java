@@ -22,7 +22,7 @@ import oracle.security.pki.textui.OraclePKIGenFunc;
 
 public class CloudConnectionManager {
 
-	 public static Connection getConnection(File fUrl,String user,String password) throws IOException, SQLException{
+	 public static Connection getConnection(File fUrl,String user,String password, String serviceName) throws IOException, SQLException{
 		    Path tmp = Files.createTempDirectory("oracle_cloud_config");
 		    // clean up on exit
 		    tmp.toFile().deleteOnExit();
@@ -87,7 +87,7 @@ public class CloudConnectionManager {
 		    System.setProperty("javax.net.ssl.keyStore",keyPath);
 		    System.setProperty("javax.net.ssl.keyStorePassword",passwd.toString());
 
-		    Connection conn = DriverManager.getConnection("jdbc:oracle:thin:@dbaccess",user,password);
+		    Connection conn = DriverManager.getConnection("jdbc:oracle:thin:@" + serviceName, user,password);
 		    zf.close();
 		    return conn;
 	 }
