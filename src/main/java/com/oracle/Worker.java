@@ -53,7 +53,8 @@ public class Worker implements Runnable {
 	
 	private static final int MAX_ORDERS=5;
 	
-	public Worker(String restURL, Integer waitSec, String jdbc, String file, boolean staticData, boolean historicData) {
+	public Worker(String restURL, Integer waitSec, String jdbc, String username, String password,
+			String file, boolean staticData, boolean historicData, String credFile) {
 		this.waitSec = waitSec.intValue();
 		this.restURL = restURL;
 		this.staticData = staticData;
@@ -73,7 +74,7 @@ public class Worker implements Runnable {
 		if (null != jdbc) {
 			loadDB = true;
 			try {
-				conn = CloudConnectionManager.getConnection(new File("/Users/gvenzl/Documents/coffeeshop/client_credentials_Maria.zip"), "coffeeshop", "coffeeshop", "dbaccess");
+				conn = CloudConnectionManager.getConnection(new File(credFile), username, password, "dbaccess");
 				conn.setAutoCommit(false);
 				// Write into sales history table rather than sales
 				if (this.historicData) {
