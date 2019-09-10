@@ -2,12 +2,12 @@ package com.oracle;
 
 public class Coffeeshop {
 	
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) {
 		
 		Integer threads=1;
 		Integer waitSec=2;
 		String  restURL="";
-		String  jdbc=null;
+		String  jdbc="";
 		String  username="";
 		String  password="";
 		String  file="";
@@ -64,18 +64,20 @@ public class Coffeeshop {
 	
 	public static void printHelp() {
 		System.out.println("java -jar coffeeshop.jar --threads <n> --wait <n>sec --url <REST url> --jdbc <JDBC url> --historic");
-		System.out.println("--threads <n>\t\tThe amount of concurrent sessions that should be used.");
-		System.out.println("--wait <n>\t\tThe amount of seconds that the program should pause between requests.");
+		System.out.println("--threads <n>\t\tThe amount of concurrent sessions that should be used. [Default: 1]");
+		System.out.println("--wait <n>\t\tThe amount of seconds that the program should pause between requests. [Default: 2]");
 		System.out.println("--url <REST URL>\tThe REST URL to use for the rest call.");
 		System.out.println("--jdbc <JDBC url>\tThe JDBC connection string to use for the inserts.");
 		System.out.println("--user <username>\tThe JDBC user, only applicable when run with jdbc.");
 		System.out.println("--pwd <password>\tThe JDBC password, only applicable with jdbc.");
 		System.out.println("--file <file name>\tThe file name for the data.");
 		System.out.println("--historic\t\tLoads into historic table rather than active table");
-		System.out.println("--creds <file path>\tPath to Exadata Express credential file (only needed for JDBC access)");
+		System.out.println("--creds <file path>\tPath to Oracle Cloud credential file (optional, only needed for ATP/ADW)");
 	}
 
-	public void run(Integer threads, Integer waitSec, String restURL, String jdbc, String username, String password, String file, boolean historicData, String credFile) {
+	public void run(Integer threads, Integer waitSec, String restURL,
+					String jdbc, String username, String password,
+					String file, boolean historicData, String credFile) {
 		Generator generator = new Generator(restURL, threads, waitSec, jdbc, username, password, file, false, historicData, credFile);
 		generator.run();
 	}

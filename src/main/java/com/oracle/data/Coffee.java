@@ -10,7 +10,7 @@ public class Coffee {
 	
 	public class CoffeeEntry {
 		public String coffee;
-		public double salesAmount;
+		public double price;
 	}
 	
 	private static int arraySize = 24;
@@ -21,7 +21,7 @@ public class Coffee {
 				"  {                                     \n"+
 				"    \"item\": \"Espresso\",             \n"+
 				"    \"size\": \"small\",                \n"+
-				"    \"salesAmount\": 2.10,             \n"+
+				"    \"price\": 2.10,             \n"+
 				"    \"coffeeUsedGram\": 10            \n"+
 				"  }";
 		coffees[0][1] = "2.10";
@@ -30,7 +30,7 @@ public class Coffee {
 				"  {                                     \n"+
 				"    \"item\": \"Espresso\",             \n"+
 				"    \"size\": \"medium\",               \n"+
-				"    \"salesAmount\": 2.30,             \n"+
+				"    \"price\": 2.30,             \n"+
 				"    \"coffeeUsedGram\": 15            \n"+
 				"  }";
 		coffees[1][1] = "2.30";
@@ -39,7 +39,7 @@ public class Coffee {
 				"  {                                     \n"+
 				"    \"item\": \"Espresso\",             \n"+
 				"    \"size\": \"large\",                \n"+
-				"    \"salesAmount\": 2.50,             \n"+
+				"    \"price\": 2.50,             \n"+
 				"    \"coffeeUsedGram\": 25            \n"+
 				"  }";
 		coffees[2][1] = "2.50";
@@ -48,7 +48,7 @@ public class Coffee {
 				"  {                                     \n"+
 				"    \"item\": \"Americano\",            \n"+
 				"    \"size\": \"small\",                \n"+
-				"    \"salesAmount\": 2.65,             \n"+
+				"    \"price\": 2.65,             \n"+
 				"    \"coffeeUsedGram\": 10            \n"+
 				"  }";
 		coffees[3][1] = "2.65";
@@ -57,7 +57,7 @@ public class Coffee {
 				"  {                                     \n"+
 				"    \"item\": \"Americano\",            \n"+
 				"    \"size\": \"medium\",               \n"+
-				"    \"salesAmount\": 2.95,             \n"+
+				"    \"price\": 2.95,             \n"+
 				"    \"coffeeUsedGram\": 15            \n"+
 				"  }";
 		coffees[4][1] = "2.95";
@@ -66,7 +66,7 @@ public class Coffee {
 				"  {                                     \n"+
 				"    \"item\": \"Americano\",            \n"+
 				"    \"size\": \"large\",                \n"+
-				"    \"salesAmount\": 3.25,             \n"+
+				"    \"price\": 3.25,             \n"+
 				"    \"coffeeUsedGram\": 25            \n"+
 				"  }";
 		coffees[5][1] = "3.25";
@@ -75,7 +75,7 @@ public class Coffee {
 				"  {                                     \n"+
 				"    \"item\": \"Latte\",                \n"+
 				"    \"size\": \"small\",                \n"+
-				"    \"salesAmount\": 2.95,             \n"+
+				"    \"price\": 2.95,             \n"+
 				"    \"coffeeUsedGram\": 10            \n"+
 				"  }";
 		coffees[6][1] = "2.95";
@@ -84,7 +84,7 @@ public class Coffee {
 				"  {                                     \n"+
 				"    \"item\": \"Latte\",                \n"+
 				"    \"size\": \"medium\",               \n"+
-				"    \"salesAmount\": 3.65,             \n"+
+				"    \"price\": 3.65,             \n"+
 				"    \"coffeeUsedGram\": 15            \n"+
 				"  }";
 		coffees[7][1] = "3.65";
@@ -93,7 +93,7 @@ public class Coffee {
 				"  {                                     \n"+
 				"    \"item\": \"Latte\",                \n"+
 				"    \"size\": \"large\",                \n"+
-				"    \"salesAmount\": 4.15,             \n"+
+				"    \"price\": 4.15,             \n"+
 				"    \"coffeeUsedGram\": 25            \n"+
 				"  }";
 		coffees[8][1] = "4.15";
@@ -102,7 +102,7 @@ public class Coffee {
 				"  {                                     \n"+
 				"    \"item\": \"Cappuccino\",           \n"+
 				"    \"size\": \"small\",                \n"+
-				"    \"salesAmount\": 3.15,             \n"+
+				"    \"price\": 3.15,             \n"+
 				"    \"coffeeUsedGram\": 10            \n"+
 				"  }";
 		coffees[9][1] = "3.15";
@@ -111,7 +111,7 @@ public class Coffee {
 				"  {                                     \n"+
 				"    \"item\": \"Cappuccino\",           \n"+
 				"    \"size\": \"medium\",               \n"+
-				"    \"salesAmount\": 3.45,             \n"+
+				"    \"price\": 3.45,             \n"+
 				"    \"coffeeUsedGram\": 15            \n"+
 				"  }";
 		coffees[10][1] = "3.45";
@@ -120,7 +120,7 @@ public class Coffee {
 				"  {                                     \n"+
 				"    \"item\": \"Cappuccino\",           \n"+
 				"    \"size\": \"large\",                \n"+
-				"    \"salesAmount\": 3.85,             \n"+
+				"    \"price\": 3.85,             \n"+
 				"    \"coffeeUsedGram\": 25            \n"+
 				"  }";
 		coffees[11][1] = "3.85";
@@ -129,16 +129,16 @@ public class Coffee {
 				"  {                                     \n"+
 				"    \"item\": \"Macchiato\",            \n"+
 				"    \"size\": \"small\",                \n"+
-				"    \"salesAmount\": 3.75,             \n"+
+				"    \"price\": 3.75,             \n"+
 				"    \"coffeeUsedGram\": 10            \n"+
 				"  }";
 		coffees[12][1] = "3.75";
-		
+
 		coffees[13][0] =
 				"  {                                     \n"+
 				"    \"item\": \"Macchiato\",            \n"+
 				"    \"size\": \"medium\",               \n"+
-				"    \"salesAmount\": 4.45,             \n"+
+				"    \"price\": 4.45,             \n"+
 				"    \"coffeeUsedGram\": 15            \n"+
 				"  }";
 		coffees[13][1] = "4.45";
@@ -147,7 +147,7 @@ public class Coffee {
 				"  {                                     \n"+
 				"    \"item\": \"Macchiato\",            \n"+
 				"    \"size\": \"large\",                \n"+
-				"    \"salesAmount\": 4.75,             \n"+
+				"    \"price\": 4.75,             \n"+
 				"    \"coffeeUsedGram\": 25            \n"+
 				"  }";
 		coffees[14][1] = "4.75";
@@ -156,7 +156,7 @@ public class Coffee {
 				"  {                                     \n"+
 				"    \"item\": \"Vanilla Cream Coffee\", \n"+
 				"    \"size\": \"small\",                \n"+
-				"    \"salesAmount\": 3.25,             \n"+
+				"    \"price\": 3.25,             \n"+
 				"    \"coffeeUsedGram\": 10            \n"+
 				"  }";
 		coffees[15][1] = "3.25";
@@ -165,7 +165,7 @@ public class Coffee {
 				"  {                                     \n"+
 				"    \"item\": \"Vanilla Cream Coffee\", \n"+
 				"    \"size\": \"medium\",               \n"+
-				"    \"salesAmount\": 3.95,             \n"+
+				"    \"price\": 3.95,             \n"+
 				"    \"coffeeUsedGram\": 15            \n"+
 				"  }";
 		coffees[16][1] = "3.95";
@@ -174,7 +174,7 @@ public class Coffee {
 				"  {                                     \n"+
 				"    \"item\": \"Vanilla Cream Coffee\", \n"+
 				"    \"size\": \"large\",                \n"+
-				"    \"salesAmount\": 4.45,             \n"+
+				"    \"price\": 4.45,             \n"+
 				"    \"coffeeUsedGram\": 25            \n"+
 				"  }";
 		coffees[17][1] = "4.45";
@@ -183,16 +183,16 @@ public class Coffee {
 				"  {                                     \n"+
 				"    \"item\": \"Caramel Cream Coffee\", \n"+
 				"    \"size\": \"small\",                \n"+
-				"    \"salesAmount\": 3.95,             \n"+
+				"    \"price\": 3.95,             \n"+
 				"    \"coffeeUsedGram\": 10            \n"+
 				"  }";
 		coffees[18][1] = "3.95";
-		
+
 		coffees[19][0] =
 				"  {                                     \n"+
 				"    \"item\": \"Caramel Cream Coffee\", \n"+
 				"    \"size\": \"medium\",               \n"+
-				"    \"salesAmount\": 4.45,             \n"+
+				"    \"price\": 4.45,             \n"+
 				"    \"coffeeUsedGram\": 15            \n"+
 				"  }";
 		coffees[19][1] = "4.45";
@@ -201,7 +201,7 @@ public class Coffee {
 				"  {                                     \n"+
 				"    \"item\": \"Caramel Cream Coffee\", \n"+
 				"    \"size\": \"large\",                \n"+
-				"    \"salesAmount\": 4.95,             \n"+
+				"    \"price\": 4.95,             \n"+
 				"    \"coffeeUsedGram\": 25            \n"+
 				"  }";
 		coffees[20][1] = "4.95";
@@ -210,7 +210,7 @@ public class Coffee {
 				"  {                                     \n"+
 				"    \"item\": \"Mocha\",                \n"+
 				"    \"size\": \"small\",                \n"+
-				"    \"salesAmount\": 3.45,             \n"+
+				"    \"price\": 3.45,             \n"+
 				"    \"coffeeUsedGram\": 10            \n"+
 				"  }";
 		coffees[21][1] = "3.45";
@@ -219,7 +219,7 @@ public class Coffee {
 				"  {                                     \n"+
 				"    \"item\": \"Mocha\",                \n"+
 				"    \"size\": \"medium\",               \n"+
-				"    \"salesAmount\": 4.15,             \n"+
+				"    \"price\": 4.15,             \n"+
 				"    \"coffeeUsedGram\": 15            \n"+
 				"  }";
 		coffees[22][1] = "4.15";
@@ -228,7 +228,7 @@ public class Coffee {
 				"  {                                     \n"+
 				"    \"item\": \"Mocha\",                \n"+
 				"    \"size\": \"large\",                \n"+
-				"    \"salesAmount\": 4.65,             \n"+
+				"    \"price\": 4.65,             \n"+
 				"    \"coffeeUsedGram\": 25            \n"+
 				"  }";
 		coffees[23][1] = "4.65";
@@ -238,8 +238,8 @@ public class Coffee {
 		
 		CoffeeEntry ret = new CoffeeEntry();
 		int entry = new Random().nextInt(arraySize);
-		ret.coffee =       coffees[entry][0];
-		ret.salesAmount = Double.valueOf(coffees[entry][1]).doubleValue();
+		ret.coffee = coffees[entry][0];
+		ret.price = Double.parseDouble(coffees[entry][1]);
 
 		return ret;
 	}

@@ -1,13 +1,25 @@
 package com.oracle;
 
-import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import com.oracle.data.Coffee;
+import com.oracle.data.CustomerAndLocation;
+import com.oracle.data.StaticData;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.security.cert.X509Certificate;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.text.DateFormat;
@@ -17,23 +29,6 @@ import java.util.Date;
 import java.util.Random;
 import java.util.TimeZone;
 
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-
-import com.oracle.data.Coffee;
-import com.oracle.data.CustomerAndLocation;
-import com.oracle.data.StaticData;
-
 public class Worker implements Runnable {
 
 	private Connection conn;
@@ -41,21 +36,23 @@ public class Worker implements Runnable {
 	private int batchSize = 0;
 	private int waitSec = 0;
 	private String restURL;
-	private boolean writeFile=false;
-	private boolean stop=false;
-	private boolean loadDB=false;
-	private boolean loadREST=false;
-	private PreparedStatement stmt=null;
-	private boolean staticData=false;
-	private boolean historicData=false;
+	private boolean writeFile = false;
+	private boolean stop = false;
+	private boolean loadDB = false;
+	private boolean loadREST = false;
+	private PreparedStatement stmt = null;
+	private boolean staticData = false;
+	private boolean historicData = false;
 	private Random random;
 	private BufferedWriter bw;
+
+	private static int BATCH_SIZE = 100;
 	
 	private static final int MAX_ORDERS=5;
 	
 	public Worker(String restURL, Integer waitSec, String jdbc, String username, String password,
-			String file, boolean staticData, boolean historicData, String credFile) {
-		this.waitSec = waitSec.intValue();
+			String file, boolean staticData, boolean historicData, String credFile) throws Exception {
+		this.waitSec = waitSec;
 		this.restURL = restURL;
 		this.staticData = staticData;
 		this.historicData = historicData;
@@ -71,11 +68,17 @@ public class Worker implements Runnable {
 			}
 		}
 		
-		if (null != jdbc) {
+		if (!jdbc.isEmpty() || !credFile.isEmpty()) {
 			loadDB = true;
 			try {
-				conn = CloudConnectionManager.getConnection(new File(credFile), username, password, "dbaccess");
+				if (!credFile.isEmpty()) {
+					conn = CloudConnectionManager.getConnection(new File(credFile), username, password, "dbaccess");
+				}
+				else {
+					conn = DriverManager.getConnection(jdbc, username, password);
+				}
 				conn.setAutoCommit(false);
+
 				// Write into sales history table rather than sales
 				if (this.historicData) {
 					stmt = conn.prepareStatement("INSERT INTO ORDERS_HISTORY (order_details) VALUES(?)");
@@ -86,12 +89,13 @@ public class Worker implements Runnable {
 			} catch (SQLException | IOException e) {
 				System.out.println("Bugger!");
 				System.out.println(e.getMessage());
+				throw e;
 			}
 		}
 		
 		loadREST = !restURL.isEmpty();
 	}
-	
+
 	private String generateDate() {
 		TimeZone tz = TimeZone.getTimeZone("UTC");
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -100,7 +104,7 @@ public class Worker implements Runnable {
 	}
 	
 	private Date getDate() {
-		// If history 
+		// If history
 		if (historicData) {
 			return generateHistoricDate();
 		}
@@ -114,7 +118,7 @@ public class Worker implements Runnable {
 	}
 	
 	private Date generateHistoricDate() {
-		return new Date(new Date().getTime() + (random.nextInt(365) *24 *3600 * 1000l ));
+		return new Date(new Date().getTime() + (random.nextInt(365) *24 *3600 * 1000L ));
 	}
 	
 	private String generateLocation() {
@@ -132,18 +136,18 @@ public class Worker implements Runnable {
 		Coffee coffeeSale = new Coffee();
 		
 		// Get random number of orders
-		int orders = new Random().nextInt(MAX_ORDERS) + 1;
+		int orders = random.nextInt(MAX_ORDERS) + 1;
 		
 		for (int i=0;i<orders;i++) {
 			Coffee.CoffeeEntry coffee = coffeeSale.getCoffee();
 			order = order + coffee.coffee + ",";
-			salesTotal += coffee.salesAmount;
+			salesTotal += coffee.price;
 		}
 		
 		// Round to 2 digits after the comma
 		DecimalFormat df = new DecimalFormat("###.##");
 		
-		return  "  \"salesAmount\": " + df.format(salesTotal) + ",\n  " +
+		return  "  \"salesTotal\": " + df.format(salesTotal) + ",\n  " +
 		              order.substring(0, order.length()-1) + "]";
 	}
 	
@@ -157,7 +161,6 @@ public class Worker implements Runnable {
 	
 	@Override
 	public void run() {
-		Random random = new Random();
 		while (!stop) {
 			loadData();
 			try {
@@ -173,17 +176,10 @@ public class Worker implements Runnable {
 	
 	private void loadData() {
 		String order = generateSale();
-		if (writeFile) {
-			writeIntoFile(order);
-		}
-		
-		if (loadDB) {
-			loadDataIntoDB(order);
-		}
-		
-		if (loadREST) {
-			loadRest(order);
-		}
+
+		if (writeFile) { writeIntoFile(order); }
+		if (loadDB) { loadDataIntoDB(order); }
+		if (loadREST) { loadRest(order); }
 	}
 	
 	private void writeIntoFile(String order) {
@@ -200,15 +196,18 @@ public class Worker implements Runnable {
 			batchSize = batchSize + 1;
 			stmt.setBlob(1, new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8)));
 			stmt.addBatch();
-			if (batchSize == 100) {
+			if (batchSize == BATCH_SIZE) {
 				stmt.executeBatch();
 				conn.commit();
 				batchSize = 0;
+				System.out.println("Data successfully inserted.");
 			}
 			
 		} catch (SQLException e) {
 			System.out.println("Good try, but not good enough!");
 			System.out.println(e.getMessage());
+			e.printStackTrace(System.err);
+			stop = true;
 		}
 		
 	}
@@ -251,9 +250,4 @@ public class Worker implements Runnable {
 			System.out.println("Error on calling REST: " + e.getMessage());
 		}
 	}
-	
-	void stop() {
-		stop=true;
-	}
-
 }

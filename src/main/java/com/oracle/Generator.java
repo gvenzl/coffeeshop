@@ -32,12 +32,24 @@ public class Generator {
 	}
 	
 	public void run() {
-		ArrayList<Thread> workers = new ArrayList<Thread>();
-		
-		for (int i=0; i<threads.intValue(); i++) {
-			Thread worker = new Thread(new Worker(restURL, wait, jdbc, username, password, file, staticData, historyData, credFile));
-			worker.start();
-			workers.add(worker);
+		ArrayList<Thread> workers = new ArrayList<>();
+
+		try {
+			for (int i = 0; i < threads; i++) {
+				Thread worker = new Thread(new Worker(restURL, wait, jdbc, username, password, file, staticData, historyData, credFile));
+				worker.start();
+				workers.add(worker);
+			}
+
+			for (Thread worker : workers) {
+				worker.join();
+			}
+		}
+		catch (Exception e) {
+			System.out.println("Error occurred, stopping.");
+			for (Thread worker : workers) {
+				worker.interrupt();
+			}
 		}
 	}
 }
