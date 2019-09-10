@@ -1,0 +1,40 @@
+{
+ "date": "2016-05-03 18:25:20",
+  "location": {                                        
+     "city": "New York",                             
+     "state": "NY",                                  
+     "address": "501 7th Avenue",                    
+     "zipcode": "10018"                              
+  },                                                     
+  "employee": {                                        
+     "firstName": "Marco",                           
+     "lastName": "Franco"                            
+  },
+  "sales_amount": 19.85,
+  "order": [  {                                     
+    "item": "Macchiato",            
+    "size": "small",                
+    "sales_amount": 3.75,             
+    "coffee_used_gram": 10            
+  },  {                                     
+    "item": "Vanilia Frappuccino",  
+    "size": "large",                
+    "sales_amount": 4.45,             
+    "coffee_used_gram": 25            
+  },  {                                     
+    "item": "Caramel Frappuccino",  
+    "size": "small",                
+    "sales_amount": 3.95,             
+    "coffee_used_gram": 10            
+  },  {                                     
+    "item": "Caramel Frappuccino",  
+    "size": "small",                
+    "sales_amount": 3.95,             
+    "coffee_used_gram": 10            
+  },  {                                     
+    "item": "Macchiato",            
+    "size": "small",                
+    "sales_amount": 3.75,             
+    "coffee_used_gram": 10            
+  }]
+}
