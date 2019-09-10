@@ -34,6 +34,7 @@ public class Worker implements Runnable {
 	private Connection conn;
 	
 	private int batchSize = 0;
+	private int batchRows = 0;
 	private int waitSec = 0;
 	private String restURL;
 	private boolean writeFile = false;
@@ -45,17 +46,16 @@ public class Worker implements Runnable {
 	private boolean historicData = false;
 	private Random random;
 	private BufferedWriter bw;
-
-	private static int BATCH_SIZE = 100;
 	
 	private static final int MAX_ORDERS=5;
 	
 	public Worker(String restURL, Integer waitSec, String jdbc, String username, String password,
-			String file, boolean staticData, boolean historicData, String credFile) throws Exception {
+			String file, Integer batchSize, boolean staticData, boolean historicData, String credFile) throws Exception {
 		this.waitSec = waitSec;
 		this.restURL = restURL;
 		this.staticData = staticData;
 		this.historicData = historicData;
+		this.batchSize = batchSize;
 		this.random = new Random();
 		
 		if (!file.isEmpty()) {
@@ -193,13 +193,13 @@ public class Worker implements Runnable {
 	
 	private void loadDataIntoDB(String data) {
 		try {
-			batchSize = batchSize + 1;
+			batchRows += 1;
 			stmt.setBlob(1, new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8)));
 			stmt.addBatch();
-			if (batchSize == BATCH_SIZE) {
+			if (batchRows == batchSize) {
 				stmt.executeBatch();
 				conn.commit();
-				batchSize = 0;
+				batchRows = 0;
 				System.out.println("Data successfully inserted.");
 			}
 			

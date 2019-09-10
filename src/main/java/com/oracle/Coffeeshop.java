@@ -1,19 +1,21 @@
 package com.oracle;
 
 public class Coffeeshop {
-	
-	public static void main(String[] args) {
-		
-		Integer threads=1;
-		Integer waitSec=2;
-		String  restURL="";
-		String  jdbc="";
-		String  username="";
-		String  password="";
-		String  file="";
-		String  credFile="";
-		boolean historicData = false;
-		
+
+    private static Integer threads=1;
+    private static Integer waitSec=2;
+    private static Integer batchSize=0;
+    private static String  restURL="";
+    private static String  jdbc="";
+    private static String  username="";
+    private static String  password="";
+    private static String  file="";
+    private static String  credFile="";
+    private static boolean historicData = false;
+
+
+    public static void main(String[] args) {
+
 		if (args.length == 0) {
 			printHelp();
 			System.exit(1);
@@ -35,9 +37,12 @@ public class Coffeeshop {
 			else if (args[i].equalsIgnoreCase("--user")) {
 				username = args[++i];
 			}
-			else if (args[i].equalsIgnoreCase("--pwd")) {
-				password = args[++i];
-			}
+            else if (args[i].equalsIgnoreCase("--pwd")) {
+                password = args[++i];
+            }
+            else if (args[i].equalsIgnoreCase("--batch")) {
+                batchSize = Integer.parseInt(args[++i]);
+            }
 			else if (args[i].equalsIgnoreCase("--file")) {
 				file = args[++i];
 			}
@@ -59,7 +64,7 @@ public class Coffeeshop {
 			}
 		}
 
-		new Coffeeshop().run(threads, waitSec, restURL, jdbc, username, password, file, historicData, credFile);
+		new Coffeeshop().run();
 	}
 	
 	public static void printHelp() {
@@ -68,17 +73,16 @@ public class Coffeeshop {
 		System.out.println("--wait <n>\t\tThe amount of seconds that the program should pause between requests. [Default: 2]");
 		System.out.println("--url <REST URL>\tThe REST URL to use for the rest call.");
 		System.out.println("--jdbc <JDBC url>\tThe JDBC connection string to use for the inserts.");
-		System.out.println("--user <username>\tThe JDBC user, only applicable when run with jdbc.");
-		System.out.println("--pwd <password>\tThe JDBC password, only applicable with jdbc.");
-		System.out.println("--file <file name>\tThe file name for the data.");
-		System.out.println("--historic\t\tLoads into historic table rather than active table");
-		System.out.println("--creds <file path>\tPath to Oracle Cloud credential file (optional, only needed for ATP/ADW)");
+        System.out.println("--creds <file path>\tPath to Oracle Cloud credential file (optional).");
+		System.out.println("--user <username>\tThe JDBC user (only applicable for JDBC connection).");
+		System.out.println("--pwd <password>\tThe JDBC password (only applicable for JDBC connection).");
+		System.out.println("--batch <n>\tThe batch size to use (only applicable for JDBC connection).");
+		System.out.println("--file <file name>\tThe file name for the data. This will write the data into a text file.");
+		System.out.println("--historic\t\tLoads into historic table rather than active table (optional).");
 	}
 
-	public void run(Integer threads, Integer waitSec, String restURL,
-					String jdbc, String username, String password,
-					String file, boolean historicData, String credFile) {
-		Generator generator = new Generator(restURL, threads, waitSec, jdbc, username, password, file, false, historicData, credFile);
+	public void run() {
+		Generator generator = new Generator(restURL, threads, waitSec, jdbc, username, password, file, batchSize,false, historicData, credFile);
 		generator.run();
 	}
 
