@@ -2,18 +2,6 @@ package com.oracle;
 
 public class Coffeeshop {
 
-    private static Integer threads=1;
-    private static Integer waitSec=2;
-    private static Integer batchSize=0;
-    private static String  restURL="";
-    private static String  jdbc="";
-    private static String  username="";
-    private static String  password="";
-    private static String  file="";
-    private static String  credFile="";
-    private static boolean historicData = false;
-
-
     public static void main(String[] args) {
 
 		if (args.length == 0) {
@@ -23,34 +11,37 @@ public class Coffeeshop {
 		
 		for (int i=0; i<args.length; i++) {
 			if (args[i].equalsIgnoreCase("--threads")) {
-				threads = Integer.valueOf(args[++i]);
+				Parameters.setThreads(Integer.valueOf(args[++i]));
 			}
 			else if (args[i].equalsIgnoreCase("--wait")) {
-				waitSec = Integer.valueOf(args[++i]);
+				Parameters.setWaitSec(Integer.valueOf(args[++i]));
 			}
 			else if (args[i].equalsIgnoreCase("--url")) {
-				restURL = args[++i];
+				Parameters.setRestURL(args[++i]);
 			}
 			else if (args[i].equalsIgnoreCase("--jdbc")) {
-				jdbc = args[++i];
+				Parameters.setJdbc(args[++i]);
 			}
 			else if (args[i].equalsIgnoreCase("--user")) {
-				username = args[++i];
+				Parameters.setUsername(args[++i]);
 			}
             else if (args[i].equalsIgnoreCase("--pwd")) {
-                password = args[++i];
+				Parameters.setPassword(args[++i]);
             }
             else if (args[i].equalsIgnoreCase("--batch")) {
-                batchSize = Integer.parseInt(args[++i]);
+				Parameters.setBatchSize(Integer.parseInt(args[++i]));
             }
 			else if (args[i].equalsIgnoreCase("--file")) {
-				file = args[++i];
+				Parameters.setFile(args[++i]);
 			}
 			else if (args[i].equalsIgnoreCase("--historic")) {
-				historicData = true;
+				Parameters.setHistoricData(true);
+			}
+			else if (args[i].equalsIgnoreCase("--static")) {
+				Parameters.setStaticData(true);
 			}
 			else if (args[i].equalsIgnoreCase("--creds")) {
-				credFile = args[++i];
+				Parameters.setCredFile(args[++i]);
 			}
 			else if (args[i].equalsIgnoreCase("--help") ||
 					args[i].equalsIgnoreCase("-h") ||
@@ -79,11 +70,11 @@ public class Coffeeshop {
 		System.out.println("--batch <n>\tThe batch size to use (only applicable for JDBC connection).");
 		System.out.println("--file <file name>\tThe file name for the data. This will write the data into a text file.");
 		System.out.println("--historic\t\tLoads into historic table rather than active table (optional).");
+		System.out.println("--static\t\tIncludes static data in the order to increase its size (optional).");
 	}
 
 	public void run() {
-		Generator generator = new Generator(restURL, threads, waitSec, jdbc, username, password, file, batchSize,false, historicData, credFile);
-		generator.run();
+		new Generator().run();
 	}
 
 }

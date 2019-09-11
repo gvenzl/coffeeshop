@@ -33,54 +33,45 @@ public class Worker implements Runnable {
 
 	private Connection conn;
 	
-	private int batchSize = 0;
 	private int batchRows = 0;
-	private int waitSec = 0;
-	private String restURL;
 	private boolean writeFile = false;
 	private boolean stop = false;
 	private boolean loadDB = false;
 	private boolean loadREST = false;
 	private PreparedStatement stmt = null;
-	private boolean staticData = false;
-	private boolean historicData = false;
 	private Random random;
 	private BufferedWriter bw;
 	
 	private static final int MAX_ORDERS=5;
 	
-	public Worker(String restURL, Integer waitSec, String jdbc, String username, String password,
-			String file, Integer batchSize, boolean staticData, boolean historicData, String credFile) throws Exception {
-		this.waitSec = waitSec;
-		this.restURL = restURL;
-		this.staticData = staticData;
-		this.historicData = historicData;
-		this.batchSize = batchSize;
+	public Worker() throws Exception {
+
 		this.random = new Random();
 		
-		if (!file.isEmpty()) {
+		if (!Parameters.getFile().isEmpty()) {
 			writeFile = true;
 			
 			try {
-				bw = new BufferedWriter(new FileWriter(file));
+				bw = new BufferedWriter(new FileWriter(Parameters.getFile()));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 		
-		if (!jdbc.isEmpty() || !credFile.isEmpty()) {
+		if (!Parameters.getJdbc().isEmpty() || !Parameters.getCredFile().isEmpty()) {
 			loadDB = true;
 			try {
-				if (!credFile.isEmpty()) {
-					conn = CloudConnectionManager.getConnection(new File(credFile), username, password, "dbaccess");
+				if (!Parameters.getCredFile().isEmpty()) {
+					conn = CloudConnectionManager.getConnection(new File(Parameters.getCredFile()),
+							Parameters.getUsername(), Parameters.getPassword(), "autonomoustp_tpurgent");
 				}
 				else {
-					conn = DriverManager.getConnection(jdbc, username, password);
+					conn = DriverManager.getConnection(Parameters.getJdbc(), Parameters.getUsername(), Parameters.getPassword());
 				}
 				conn.setAutoCommit(false);
 
 				// Write into sales history table rather than sales
-				if (this.historicData) {
+				if (Parameters.isHistoricData()) {
 					stmt = conn.prepareStatement("INSERT INTO ORDERS_HISTORY (order_details) VALUES(?)");
 				}
 				else {
@@ -93,7 +84,7 @@ public class Worker implements Runnable {
 			}
 		}
 		
-		loadREST = !restURL.isEmpty();
+		loadREST = !Parameters.getRestURL().isEmpty();
 	}
 
 	private String generateDate() {
@@ -105,7 +96,7 @@ public class Worker implements Runnable {
 	
 	private Date getDate() {
 		// If history
-		if (historicData) {
+		if (Parameters.isHistoricData()) {
 			return generateHistoricDate();
 		}
 		else {
@@ -126,7 +117,7 @@ public class Worker implements Runnable {
 	}
 	
 	private String generateStatic() {
-		return StaticData.getStaticData(staticData);
+		return StaticData.getStaticData(Parameters.isStaticData());
 	}
 	
 	private String generateOrders() {
@@ -164,8 +155,8 @@ public class Worker implements Runnable {
 		while (!stop) {
 			loadData();
 			try {
-				if (waitSec > 0 ) {
-					int sleep = random.nextInt(waitSec);
+				if (Parameters.getWaitSec() > 0 ) {
+					int sleep = random.nextInt(Parameters.getWaitSec());
 					Thread.sleep(sleep*1000);
 				}
 			} catch (InterruptedException e) {
@@ -196,7 +187,7 @@ public class Worker implements Runnable {
 			batchRows += 1;
 			stmt.setBlob(1, new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8)));
 			stmt.addBatch();
-			if (batchRows == batchSize) {
+			if (batchRows == Parameters.getBatchSize()) {
 				stmt.executeBatch();
 				conn.commit();
 				batchRows = 0;
@@ -234,7 +225,9 @@ public class Worker implements Runnable {
 		    HttpsURLConnection.setDefaultSSLSocketFactory(ctx.getSocketFactory());
 			
 			CloseableHttpClient client = HttpClients.custom().setSSLContext(ctx).setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE).build();
-			HttpPost post = new HttpPost(restURL);
+
+			/*********** SEND HTTPS post ****************/
+			HttpPost post = new HttpPost(Parameters.getRestURL());
 			post.setEntity(
 				new StringEntity(data,
 						ContentType.create("application/json", "UTF-8")));
@@ -246,6 +239,7 @@ public class Worker implements Runnable {
 			else {
 				System.out.println("Data successfully posted!");
 			}
+			/*********** HTTPS post sent ***************/
 		} catch (Exception e) {
 			System.out.println("Error on calling REST: " + e.getMessage());
 		}
