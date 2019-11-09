@@ -9,6 +9,7 @@ public class Parameters {
     private static String  jdbc="";
     private static String  username="";
     private static String  password="";
+    private static String  database="";
     private static String  file="";
     private static String  credFile="";
     private static boolean historicData = false;
@@ -69,6 +70,10 @@ public class Parameters {
     public static void setPassword(String password) {
         Parameters.password = password;
     }
+
+    public static String getDatabase() { return database; }
+
+    public static void setDatabase(String database) { Parameters.database = database; }
 
     public static String getFile() {
         return file;

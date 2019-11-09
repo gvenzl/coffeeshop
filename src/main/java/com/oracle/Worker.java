@@ -63,7 +63,7 @@ public class Worker implements Runnable {
 			try {
 				if (!Parameters.getCredFile().isEmpty()) {
 					conn = CloudConnectionManager.getConnection(new File(Parameters.getCredFile()),
-							Parameters.getUsername(), Parameters.getPassword(), "autonomoustp_tpurgent");
+							Parameters.getUsername(), Parameters.getPassword(), Parameters.getDatabase());
 				}
 				else {
 					conn = DriverManager.getConnection(Parameters.getJdbc(), Parameters.getUsername(), Parameters.getPassword());

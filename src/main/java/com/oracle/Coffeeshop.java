@@ -28,6 +28,9 @@ public class Coffeeshop {
             else if (args[i].equalsIgnoreCase("--pwd")) {
 				Parameters.setPassword(args[++i]);
             }
+			else if (args[i].equalsIgnoreCase("--database")) {
+				Parameters.setDatabase(args[++i]);
+			}
             else if (args[i].equalsIgnoreCase("--batch")) {
 				Parameters.setBatchSize(Integer.parseInt(args[++i]));
             }
@@ -67,6 +70,7 @@ public class Coffeeshop {
         System.out.println("--creds <file path>\tPath to Oracle Cloud credential file (optional).");
 		System.out.println("--user <username>\tThe JDBC user (only applicable for JDBC connection).");
 		System.out.println("--pwd <password>\tThe JDBC password (only applicable for JDBC connection).");
+		System.out.println("--database <database>\tThe database service name (only applicable for Cloud DB).");
 		System.out.println("--batch <n>\tThe batch size to use (only applicable for JDBC connection).");
 		System.out.println("--file <file name>\tThe file name for the data. This will write the data into a text file.");
 		System.out.println("--historic\t\tLoads into historic table rather than active table (optional).");
